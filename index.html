@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jacquelyn's Fruits Basket Page - 3D Sakura</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- THREE.JS LIBRARY FOR TRUE 3D ANIMATION -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #d63031;
+      --accent-color: #fd79a8;
+      --text-color: #2d3436;
+      --shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      color: var(--text-color);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 3D CANVAS OVERLAY */
+    #canvas3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* COMPACT CONTAINER */
+    .container {
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    /* TOP ACTION BUTTONS */
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #333;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      background: #ffffff;
+    }
+
+    /* MAIN CARD WITH FRUITS BASKET BOX BACKGROUND */
+    .card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(255, 200, 200, 0.4), rgba(255, 182, 193, 0.4));
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 25px;
+      padding: 20px 18px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      animation: floatBox 4s infinite ease-in-out;
+    }
+
+    /* GLASS OVERLAY TO KEEP TEXT CLEAR AND READABLE */
+    .card-overlay {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 15px;
+    }
+
+    @keyframes floatBox {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* MOVING PROFILE AVATAR */
+    .profile-container {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 10px auto;
+      cursor: pointer;
+      animation: floatMascot 3.2s infinite ease-in-out;
+    }
+
+    .profile-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .upload-icon-badge {
+      position: absolute;
+      top: 2px; right: 2px;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      font-size: 0.7rem;
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .waving-mascot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      font-size: 1.7rem;
+      background: #ffffff;
+      border-radius: 50%;
+      padding: 3px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      animation: waveMascot 2.2s infinite ease-in-out;
+      transform-origin: bottom right;
+    }
+
+    @keyframes floatMascot {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes waveMascot {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(18deg); }
+      50% { transform: rotate(-8deg); }
+      75% { transform: rotate(14deg); }
+    }
+
+    .title-greeting {
+      font-family: 'Caveat', cursive;
+      font-size: 2.1rem;
+      color: var(--primary-color);
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      color: var(--primary-color);
+      margin: 12px 0 6px 0;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+      padding-bottom: 3px;
+    }
+
+    p, ul {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #333;
+      text-align: left;
+    }
+
+    ul { padding-left: 18px; }
+
+    /* GALLERY SLOTS */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .gallery-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      aspect-ratio: 3/4;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      cursor: pointer;
+      animation: floatMascot 4s infinite ease-in-out;
+    }
+
+    .gallery-card:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .overlay-upload {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 0.68rem;
+      padding: 3px 0;
+      text-align: center;
+    }
+
+    .contact-btn {
+      display: block;
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--primary-color);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: opacity 0.3s ease;
+    }
+
+    .contact-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* MODALS */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 18px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 320px;
+      text-align: center;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #drawCanvas {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      cursor: crosshair;
+      touch-action: none;
+      background: #fff;
+    }
+
+    .canvas-tools {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .theme-options {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .theme-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- 3D SAKURA CANVAS OVERLAY -->
+  <canvas id="canvas3d"></canvas>
+
+  <!-- HIDDEN UPLOAD INPUTS -->
+  <input type="file" id="profileUploader" accept="image/*" onchange="updateImage(event, 'profileImg')">
+  <input type="file" id="galleryUploader1" accept="image/*" onchange="updateImage(event, 'galleryImg1')">
+  <input type="file" id="galleryUploader2" accept="image/*" onchange="updateImage(event, 'galleryImg2')">
+
+  <div class="container">
+    
+    <!-- TOP ACTION BUTTONS -->
+    <div class="top-actions">
+      <button class="action-btn" onclick="openModal('themeModal')">🎨 Change Theme</button>
+      <button class="action-btn" onclick="openModal('drawModal')">✏️ Draw / Note</button>
+    </div>
+
+    <!-- MAIN CARD WITH BOX BACKGROUND -->
+    <div class="card" id="mainCard">
+      <div class="card-overlay" id="cardOverlay">
+        
+        <!-- MOVING AVATAR WITH WAVING ICON -->
+        <div class="profile-container" onclick="document.getElementById('profileUploader').click()" title="Click to change photo">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23f5576c'/%3E%3Ccircle cx='50' cy='35' r='20' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='45' cy='30' r='5' fill='%23333'/%3E%3Cpath d='M 40 55 Q 50 65 60 55' fill='%23333'/%3E%3C/svg%3E" id="profileImg" alt="Fruits Basket Profile" class="profile-img">
+          <span class="upload-icon-badge">📷</span>
+          <div class="waving-mascot" title="Waving anime mascot">👋🌸</div>
+        </div>
+
+        <h1 class="title-greeting">Hello! My name is Jacquelyn</h1>
+        <h2 class="subtitle">Jacquelyn</h2>
+        <div class="badge">🌸 Fruits Basket Fan Page</div>
+
+        <p>This is a page about my favorite show, <strong>Fruits Basket</strong>. Come take a look!</p>
+
+        <!-- ABOUT THE SHOW -->
+        <h3 class="section-title">📖 About the Show</h3>
+        <p>
+          <strong>Fruits Basket</strong> is an anime based on a manga by Natsuki Takaya. It follows Tohru Honda, an orphaned high school girl who ends up living with the Sohma family. The Sohmas are cursed: whenever they are hugged by someone of the opposite sex, they transform into an animal of the Chinese zodiac.
+        </p>
+
+        <!-- CLICKABLE & MOVING ANIME GALLERY -->
+        <h3 class="section-title">🖼️ Anime Gallery (Click to Upload)</h3>
+        <div class="gallery-grid">
+          <div class="gallery-card" onclick="document.getElementById('galleryUploader1').click()" title="Click to upload Photo 1">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f093fb'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='white' font-size='20'%3E📸%3C/text%3E%3C/svg%3E" id="galleryImg1" alt="Anime Photo 1">
+            <div class="overlay-upload">📷 Upload Photo 1</div>
+          </div>
+          <div class="gallery-card" onclick="document.getElementById('galleryUploader2').click()" title="Click to upload Photo 2">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f5576c'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='white' font-size='20'%3E🎨%3C/text%3E%3C/svg%3E" id="galleryImg2" alt="Anime Photo 2">
+            <div class="overlay-upload">📷 Upload Photo 2</div>
+          </div>
+        </div>
+
+        <!-- WHY I LIKE IT -->
+        <h3 class="section-title">💖 Why I Like It</h3>
+        <ul>
+          <li>The story is emotional and teaches about healing and acceptance.</li>
+          <li>The characters feel real and grow throughout the series.</li>
+          <li>It mixes comedy with deep, heartfelt moments.</li>
+        </ul>
+
+        <!-- FAVORITE CHARACTERS -->
+        <h3 class="section-title">🌟 My Favorite Characters</h3>
+        <ul>
+          <li><strong>Yuki Sohma</strong></li>
+          <li><strong>Shigure Sohma</strong></li>
+        </ul>
+
+        <!-- CONTACT -->
+        <h3 class="section-title">✉️ Contact Me</h3>
+        <a href="mailto:trumatajacquelyn1@gmail.com" class="contact-btn">Send Email</a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWING MODAL -->
+  <div id="drawModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('drawModal')">&times;</span>
+      <h3>✏️ Draw or Note</h3>
+      <canvas id="drawCanvas" width="260" height="260"></canvas>
+      <div class="canvas-tools">
+        <button class="action-btn" onclick="clearCanvas()">Clear</button>
+        <button class="action-btn" onclick="closeModal('drawModal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME SELECTOR MODAL -->
+  <div id="themeModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('themeModal')">&times;</span>
+      <h3>🎨 Select Box Theme</h3>
+      <div class="theme-options">
+        <div class="theme-circle" style="background: rgba(255, 255, 255, 0.85);" onclick="setTheme('light')"></div>
+        <div class="theme-circle" style="background: rgba(255, 230, 240, 0.85);" onclick="setTheme('pink')"></div>
+        <div class="theme-circle" style="background: rgba(225, 245, 254, 0.85);" onclick="setTheme('blue')"></div>
+        <div class="theme-circle" style="background: rgba(230, 255, 240, 0.85);" onclick="setTheme('mint')"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 3D SAKURA PETAL SYSTEM */
+    let scene, camera, renderer, petals = [];
+    const petalCount = 45;
+
+    function init3DSakura() {
+      const canvas = document.getElementById('canvas3d');
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 25;
+
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xffeaa7, 0.5);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
+
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.bezierCurveTo(0.5, 0.5, 0.8, 1.5, 0, 2.2);
+      shape.bezierCurveTo(-0.8, 1.5, -0.5, 0.5, 0, 0);
+
+      const geometry = new THREE.ShapeGeometry(shape);
+      geometry.center();
+
+      const material = new THREE.MeshPhongMaterial({
+        color: 0xffb7c5,
+        emissive: 0xff8da1,
+        emissiveIntensity: 0.2,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.85,
+        shininess: 30
+      });
+
+      for (let i = 0; i < petalCount; i++) {
+        const petal = new THREE.Mesh(geometry, material);
+        petal.position.set(
+          (Math.random() - 0.5) * 40,
+          Math.random() * 40 - 10,
+          (Math.random() - 0.5) * 20
+        );
+        const scale = Math.random() * 0.4 + 0.3;
+        petal.scale.set(scale, scale, scale);
+        petal.rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+        petal.userData = {
+          speedY: Math.random() * 0.05 + 0.03,
+          speedX: Math.random() * 0.02 - 0.01,
+          rotSpeedX: Math.random() * 0.02 - 0.01,
+          rotSpeedY: Math.random() * 0.02 - 0.01,
+          rotSpeedZ: Math.random() * 0.02 - 0.01,
+          oscillationOffset: Math.random() * Math.PI * 2
+        };
+        petals.push(petal);
+        scene.add(petal);
+      }
+      animate3DSakura();
+    }
+
+    function animate3DSakura() {
+      requestAnimationFrame(animate3DSakura);
+      const time = Date.now() * 0.001;
+      petals.forEach(petal => {
+        const data = petal.userData;
+        petal.position.y -= data.speedY;
+        petal.position.x += Math.sin(time + data.oscillationOffset) * 0.02 + data.speedX;
+        petal.rotation.x += data.rotSpeedX;
+        petal.rotation.y += data.rotSpeedY;
+        petal.rotation.z += data.rotSpeedZ;
+
+        if (petal.position.y < -20) {
+          petal.position.y = 20;
+          petal.position.x = (Math.random() - 0.5) * 40;
+          petal.position.z = (Math.random() - 0.5) * 20;
+        }
+      });
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', init3DSakura);
+
+    /* FILE UPLOAD PREVIEW & CARD BACKGROUND SYNC */
+    function updateImage(event, targetImgId) {
+      const file = event.target.files[0];
+      if (file) {
+        const newUrl = URL.createObjectURL(file);
+        document.getElementById(targetImgId).src = newUrl;
+        // Automatically sync profile upload to box background too!
+        if (targetImgId === 'profileImg') {
+          document.getElementById('mainCard').style.backgroundImage = `url('${newUrl}')`;
+        }
+      }
+    }
+
+    /* MODAL CONTROLS */
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+      if(id === 'drawModal') initCanvas();
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    /* THEME SWITCHER */
+    function setTheme(theme) {
+      const overlay = document.getElementById('cardOverlay');
+      const root = document.documentElement;
+      if (theme === 'light') {
+        overlay.style.background = 'rgba(255, 255, 255, 0.82)';
+        root.style.setProperty('--primary-color', '#d63031');
+      } else if (theme === 'pink') {
+        overlay.style.background = 'rgba(255, 230, 240, 0.85)';
+        root.style.setProperty('--primary-color', '#e84393');
+      } else if (theme === 'blue') {
+        overlay.style.background = 'rgba(225, 245, 254, 0.85)';
+        root.style.setProperty('--primary-color', '#0984e3');
+      } else if (theme === 'mint') {
+        overlay.style.background = 'rgba(230, 255, 240, 0.85)';
+        root.style.setProperty('--primary-color', '#00b894');
+      }
+      closeModal('themeModal');
+    }
+
+    /* DRAWING CANVAS */
+    let canvas, ctx, painting = false;
+
+    function initCanvas() {
+      canvas = document.getElementById('drawCanvas');
+      ctx = canvas.getContext('2d');
+      canvas.addEventListener('mousedown', startPosition);
+      canvas.addEventListener('mouseup', finishedPosition);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('touchstart', startPosition);
+      canvas.addEventListener('touchend', finishedPosition);
+      canvas.addEventListener('touchmove', draw);
+    }
+
+    function startPosition(e) { painting = true; draw(e); }
+    function finishedPosition() { painting = false; ctx.beginPath(); }
+
+    function draw(e) {
+      if (!painting) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#d63031';
+
+      ctx.lineTo(clientX - rect.left, clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+  </script>
+</body>
+</html>
